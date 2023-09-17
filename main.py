@@ -73,19 +73,22 @@ df = pd.DataFrame(
 with pd.option_context("display.max_rows", None, "display.max_columns", None):
     print(df)
 
-ax = measurements.plot.kde()
+ax = measurements.plot.kde(label="kde")
 plt.xlim((0, plt.xlim()[1]))  # perf data is always positive
 (ymin, ymax) = ax.get_ylim()
-plt.vlines(s["osl_estimate"], ymin, ymax, color="red")
-plt.vlines(s["mean"], ymin, ymax, color="blue")
+plt.vlines(s["osl_estimate"], ymin, ymax, color="red", label="osl estimate")
+plt.vlines(s["mean"], ymin, ymax, color="blue", label="mean")
+plt.legend()
 
+plt.savefig("docs/kde.png")
 plt.figure()
 
 X = np.arange(len(measurements))
 plt.scatter(X, measurements)
 
+plt.savefig("docs/measures.png")
 plt.figure()
 
 plt.scatter(X, s["total_time"], color="black")
 plt.plot(X, s["pred"], linewidth=3)
-plt.show()
+plt.savefig("docs/osl.png")
