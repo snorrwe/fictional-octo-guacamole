@@ -15,4 +15,4 @@ Example output:
 
 ![KDE](docs/kde.png)
 ![measures](docs/measures.png)
-![osl](docs/osl.png)
+![osl](docs/ols.png)
