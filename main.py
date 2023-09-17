@@ -6,7 +6,6 @@ from sklearn.metrics import r2_score
 
 # create random test data, these should be output by the benchmarks
 measurements = np.loadtxt("frame-times.txt")
-N = len(measurements)
 measurements = pd.Series(measurements)
 
 
@@ -41,7 +40,7 @@ def bootstrap(n, iters):
 s = run(measurements)
 bs = {k: [] for k in s.keys()}
 
-for idx in bootstrap(N, 1000):
+for idx in bootstrap(len(measurements), 1000):
     d = run(measurements[idx])
     for k, v in d.items():
         bs[k].append(v)
