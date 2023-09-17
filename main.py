@@ -10,35 +10,83 @@ N = len(measurements)
 measurements = pd.Series(measurements)
 
 
-# for each index (i) total_time[i] = total time spent so far (sum(measurements[0..i]))
-total_time = np.cumsum(measurements)
-X = np.arange(N, dtype=float).reshape(-1, 1)
+def run(measurements):
+    # for each index (i) total_time[i] = total time spent so far (sum(measurements[0..i]))
+    total_time = np.cumsum(measurements)
+    X = np.arange(len(measurements), dtype=float).reshape(-1, 1)
 
-regr = linear_model.LinearRegression()
+    regr = linear_model.LinearRegression()
 
-regr.fit(X, total_time)
+    regr.fit(X, total_time)
 
-pred_total_time = regr.predict(X)
+    pred_total_time = regr.predict(X)
 
-mean = np.average(measurements)
-osl_estimate = regr.coef_[0]
-print("OLS regression estimate", osl_estimate)
-print("R2 score", r2_score(total_time, pred_total_time))
-print("mean", mean)
-print("stdev", np.std(measurements))
+    mean = np.average(measurements)
+    osl_estimate = regr.coef_[0]
+    return {
+        "mean": mean,
+        "std": np.std(measurements),
+        "osl_estimate": osl_estimate,
+        "r2": r2_score(total_time, pred_total_time),
+        "total_time": total_time,
+        "pred": pred_total_time,
+    }
+
+
+def bootstrap(n, iters):
+    for _ in range(iters):
+        yield np.random.choice(n, n, replace=True)
+
+
+s = run(measurements)
+bs = {k: [] for k in s.keys()}
+
+for idx in bootstrap(N, 1000):
+    d = run(measurements[idx])
+    for k, v in d.items():
+        bs[k].append(v)
+
+
+df = pd.DataFrame(
+    {
+        "label": ["OLS regression estimate", "R2 score", "mean", "stdev"],
+        "min": [
+            min(bs["osl_estimate"]),
+            min(bs["r2"]),
+            min(bs["mean"]),
+            min(bs["std"]),
+        ],
+        "esitmate": [
+            s["osl_estimate"],
+            s["r2"],
+            s["mean"],
+            s["std"],
+        ],
+        "max": [
+            max(bs["osl_estimate"]),
+            max(bs["r2"]),
+            max(bs["mean"]),
+            max(bs["std"]),
+        ],
+    }
+)
+
+with pd.option_context("display.max_rows", None, "display.max_columns", None):
+    print(df)
 
 ax = measurements.plot.kde()
-plt.xlim((0, plt.xlim()[1])) # perf data is always positive 
+plt.xlim((0, plt.xlim()[1]))  # perf data is always positive
 (ymin, ymax) = ax.get_ylim()
-plt.vlines(osl_estimate, ymin, ymax, color="red")
-plt.vlines(mean, ymin, ymax, color="blue")
+plt.vlines(s["osl_estimate"], ymin, ymax, color="red")
+plt.vlines(s["mean"], ymin, ymax, color="blue")
 
 plt.figure()
 
+X = np.arange(len(measurements))
 plt.scatter(X, measurements)
 
 plt.figure()
 
-plt.scatter(X, total_time, color="black")
-plt.plot(X, pred_total_time, linewidth=3)
+plt.scatter(X, s["total_time"], color="black")
+plt.plot(X, s["pred"], linewidth=3)
 plt.show()
