@@ -76,7 +76,8 @@ with pd.option_context("display.max_rows", None, "display.max_columns", None):
     print(df)
 
 ax = measurements.plot.kde(label="kde")
-plt.xlim((0, plt.xlim()[1]))  # perf data is always positive
+xlim = plt.xlim()
+plt.xlim((max(0.0, xlim[0]), xlim[1]))  # perf data is always positive
 (ymin, ymax) = ax.get_ylim()
 plt.vlines(s["ols_estimate"], ymin, ymax, color="red", label="ols estimate")
 plt.vlines(s["mean"], ymin, ymax, color="blue", label="mean")
