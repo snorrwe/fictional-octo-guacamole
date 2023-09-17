@@ -21,11 +21,11 @@ def run(measurements):
     pred_total_time = regr.predict(X)
 
     mean = np.average(measurements)
-    osl_estimate = regr.coef_[0]
+    ols_estimate = regr.coef_[0]
     return {
         "mean": mean,
         "std": np.std(measurements),
-        "osl_estimate": osl_estimate,
+        "ols_estimate": ols_estimate,
         "r2": r2_score(total_time, pred_total_time),
         "total_time": total_time,
         "pred": pred_total_time,
@@ -50,19 +50,19 @@ df = pd.DataFrame(
     {
         "label": ["OLS regression estimate", "R2 score", "mean", "stdev"],
         "min": [
-            min(bs["osl_estimate"]),
+            min(bs["ols_estimate"]),
             min(bs["r2"]),
             min(bs["mean"]),
             min(bs["std"]),
         ],
         "esitmate": [
-            s["osl_estimate"],
+            s["ols_estimate"],
             s["r2"],
             s["mean"],
             s["std"],
         ],
         "max": [
-            max(bs["osl_estimate"]),
+            max(bs["ols_estimate"]),
             max(bs["r2"]),
             max(bs["mean"]),
             max(bs["std"]),
@@ -76,7 +76,7 @@ with pd.option_context("display.max_rows", None, "display.max_columns", None):
 ax = measurements.plot.kde(label="kde")
 plt.xlim((0, plt.xlim()[1]))  # perf data is always positive
 (ymin, ymax) = ax.get_ylim()
-plt.vlines(s["osl_estimate"], ymin, ymax, color="red", label="osl estimate")
+plt.vlines(s["ols_estimate"], ymin, ymax, color="red", label="ols estimate")
 plt.vlines(s["mean"], ymin, ymax, color="blue", label="mean")
 plt.legend()
 
@@ -91,4 +91,4 @@ plt.figure()
 
 plt.scatter(X, s["total_time"], color="black")
 plt.plot(X, s["pred"], linewidth=3)
-plt.savefig("docs/osl.png")
+plt.savefig("docs/ols.png")
