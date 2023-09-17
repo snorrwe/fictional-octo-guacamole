@@ -5,8 +5,8 @@ from sklearn import linear_model
 from sklearn.metrics import r2_score
 
 # create random test data, these should be output by the benchmarks
-N = 100
-measurements = np.random.normal(37, 10, N)
+measurements = np.loadtxt("frame-times.txt")
+N = len(measurements)
 measurements = pd.Series(measurements)
 
 
@@ -28,6 +28,7 @@ print("mean", mean)
 print("stdev", np.std(measurements))
 
 ax = measurements.plot.kde()
+plt.xlim((0, plt.xlim()[1])) # perf data is always positive 
 (ymin, ymax) = ax.get_ylim()
 plt.vlines(osl_estimate, ymin, ymax, color="red")
 plt.vlines(mean, ymin, ymax, color="blue")
