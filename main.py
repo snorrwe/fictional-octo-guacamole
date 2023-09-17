@@ -21,12 +21,16 @@ regr.fit(X, total_time)
 pred_total_time = regr.predict(X)
 
 mean = np.average(measurements)
-print("OLS regression estimate", regr.coef_[0])
+osl_estimate = regr.coef_[0]
+print("OLS regression estimate", osl_estimate)
 print("R2 score", r2_score(total_time, pred_total_time))
 print("mean", mean)
 print("stdev", np.std(measurements))
 
-measurements.plot.kde()
+ax = measurements.plot.kde()
+(ymin, ymax) = ax.get_ylim()
+plt.vlines(osl_estimate, ymin, ymax, color="red")
+plt.vlines(mean, ymin, ymax, color="blue")
 
 plt.figure()
 
